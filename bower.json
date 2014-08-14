@@ -1,0 +1,12 @@
+{
+  "name": "saga",
+  "private": true,
+  "dependencies": {
+    "bootstrap-sass-official": "~3.1.0",
+    "modernizr": "~2.6.2",
+    "jquery": "~1.11.0",
+    "threejs": "*",
+    "backbone": "~1.1.2"
+  },
+  "devDependencies": {}
+}
