@@ -123,7 +123,7 @@ var AppView = Backbone.View.extend({
         plane.overdraw = true;
         plane.material.side = THREE.DoubleSide;
         plane.position = self.WorldGeometry.vertices[vertice].clone().multiplyScalar(1.1);
-        plane.rotation.y =   - Math.PI / 6;
+        //plane.rotation.y =   - Math.PI / 6;
         this.objects[obj.label] = plane;
         self.group.add(this.objects[obj.label]);
 
