@@ -6,7 +6,8 @@
     "modernizr": "~2.6.2",
     "jquery": "~1.11.0",
     "threejs": "*",
-    "backbone": "~1.1.2"
+    "backbone": "~1.1.2",
+    "tweenjs": "*"
   },
   "devDependencies": {}
 }
