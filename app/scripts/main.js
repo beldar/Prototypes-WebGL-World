@@ -1,4 +1,7 @@
-/* global Backbone, _, TRHEE, $ */
+/* global Backbone, THREE, $, Stats, requestAnimationFrame */
+'use strict';
+
+var App, Objects;
 
 var AppView = Backbone.View.extend({
     el: 'body',
@@ -191,8 +194,9 @@ var AppView = Backbone.View.extend({
     addPlanes: function(group, value) {
         var i = 1;
         for (var label in Objects[group]) {
-            if (i > value)
+            if (i > value) {
                 break;
+            }
 
             this.addPlane(Objects[group][label]);
             i++;
@@ -204,9 +208,7 @@ var AppView = Backbone.View.extend({
     }
 });
 
-var App;
-
-var Objects = {
+Objects = {
     'travel': [
         {
             label: 'eiffel',
@@ -242,7 +244,7 @@ var Objects = {
             vertice: [0, 250],
             w: 50,
             h: 50
-        },
+        }
     ],
     'sports': [
         {
