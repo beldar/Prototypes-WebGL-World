@@ -30,12 +30,12 @@ var AppView = Backbone.View.extend({
 
         // earth
 
-        var loader = new THREE.TextureLoader();
-        loader.load( 'images/land_ocean_ice_cloud_2048.jpg', function ( texture ) {
+        this.loader = new THREE.TextureLoader();
+        this.loader.load( 'images/land_ocean_ice_cloud_2048.jpg', function ( texture ) {
             self.WorldGeometry = new THREE.SphereGeometry( 200, 20, 20 );
             self.WorldGeometry.mergeVertices();
             //self.WorldGeometry.computeCentroids();
-            var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
+            var material = new THREE.MeshLambertMaterial( { map: texture, overdraw: 0.5 } );
             self.WorldMesh = new THREE.Mesh( self.WorldGeometry, material );
             self.WorldMesh.position.set(0,0,0);
             self.group.add( self.WorldMesh );
@@ -82,7 +82,16 @@ var AppView = Backbone.View.extend({
 
         this.container.appendChild( this.renderer.domElement );
 
+        //Lights
 
+        var ambientLight = new THREE.AmbientLight(0x404040);
+        this.scene.add(ambientLight);
+
+        // directional lighting
+        var directionalLight = new THREE.DirectionalLight(0xffffff);
+        //directionalLight.position.set(1, 1, 1).normalize();
+        directionalLight.position = this.camera.position;
+        this.scene.add(directionalLight);
 
         this.stats = new Stats();
         this.stats.domElement.style.position = 'absolute';
@@ -95,41 +104,24 @@ var AppView = Backbone.View.extend({
 
     },
 
-    addPlane: function(obj) {
+    addObject: function(obj) {
         var self = this;
-
-        /*var loader = new THREE.TextureLoader();
-        loader.load( spriteobj.image, function ( texture ) {
-            texture.needsUpdate = true;
-
-            var spriteMaterial = new THREE.SpriteMaterial({
-                map: texture,
-                useScreenCoordinates: false
-                //, rotation: Math.PI / 2
-            });
-            self.sprites[spriteobj.label] = new THREE.Sprite( spriteMaterial );
-            self.sprites[spriteobj.label].scale.set(50,50,50);
-            self.sprites[spriteobj.label].position = self.WorldGeometry.vertices[spriteobj.vertice].clone().multiplyScalar(1.1);
-            //self.sprites[spriteobj.label].rotation.y = - 200;
-            self.group.add( self.sprites[spriteobj.label] );
-        });*/
-
-        var img = new THREE.MeshBasicMaterial({ //CHANGED to MeshBasicMaterial
-            map:THREE.ImageUtils.loadTexture(obj.image)
+        this.loader.load(obj.image, function ( texture ) {
+            switch (obj.geometry) {
+                case 'sphere':
+                    var geometry = new THREE.SphereGeometry( obj.w, obj.w/2, obj.w/2 );
+                    break;
+                default:
+                    var geometry = new THREE.CubeGeometry( obj.h, obj.w, obj.w );
+                    break;
+            }
+            var material = new THREE.MeshLambertMaterial( { map: texture, overdraw: 0.5 } );
+            var mesh = new THREE.Mesh( geometry, material );
+            var vertice = self.getRand(obj.vertice[0], obj.vertice[1]);
+            mesh.position = self.WorldGeometry.vertices[vertice].clone().multiplyScalar(1.1);
+            self.objects[obj.label] = mesh;
+            self.group.add( mesh );
         });
-        img.map.needsUpdate = true; //ADDED
-        img.transparent = true;
-
-        // plane
-        var plane = new THREE.Mesh(new THREE.PlaneGeometry(obj.w, obj.h),img);
-        var vertice = this.getRand(obj.vertice[0], obj.vertice[1]);
-        plane.overdraw = true;
-        plane.material.side = THREE.DoubleSide;
-        plane.position = self.WorldGeometry.vertices[vertice].clone().multiplyScalar(1.1);
-        //plane.rotation.y =   - Math.PI / 6;
-        this.objects[obj.label] = plane;
-        self.group.add(this.objects[obj.label]);
-
     },
 
     resize: function() {
@@ -178,11 +170,11 @@ var AppView = Backbone.View.extend({
 
         $('#'+$range.data('value')).text($range.val());
 
-        this.clearPlanes(group);
-        this.addPlanes(group, value);
+        this.clearObjects(group);
+        this.addObjects(group, value);
     },
 
-    clearPlanes: function(group) {
+    clearObjects: function(group) {
         var obj;
         for ( var i in Objects[group] ) {
             obj = Objects[group][i];
@@ -191,14 +183,13 @@ var AppView = Backbone.View.extend({
         }
     },
 
-    addPlanes: function(group, value) {
-        var i = 1;
+    addObjects: function(group, value) {
+        var i = 1, obj;
         for (var label in Objects[group]) {
             if (i > value) {
                 break;
             }
-
-            this.addPlane(Objects[group][label]);
+            this.addObject( Objects[group][label]);
             i++;
         }
     },
@@ -213,74 +204,84 @@ Objects = {
         {
             label: 'eiffel',
             image: 'images/eiffel.png',
-            vertice: [0, 250],
-            w: 50,
-            h: 50
+            vertice: [0, 200],
+            geometry: 'plane',
+            w: 40,
+            h: 40
         },
         {
             label: 'sagrada',
             image: 'images/sagrada-familia.png',
-            vertice: [0, 250],
-            w: 50,
-            h: 50
+            vertice: [0, 200],
+            geometry: 'plane',
+            w: 40,
+            h: 40
         },
         {
             label: 'pyramid',
             image: 'images/pyramid.png',
-            vertice: [0, 250],
-            w: 50,
-            h: 50
+            vertice: [0, 200],
+            geometry: 'plane',
+            w: 40,
+            h: 40
         },
         {
             label: 'liberty',
             image: 'images/liberty.png',
-            vertice: [0, 250],
-            w: 50,
-            h: 50
+            vertice: [0, 200],
+            geometry: 'plane',
+            w: 40,
+            h: 40
         },
         {
             label: 'bigben',
             image: 'images/big-ben.png',
-            vertice: [0, 250],
-            w: 50,
-            h: 50
+            vertice: [0, 200],
+            geometry: 'plane',
+            w: 40,
+            h: 40
         }
     ],
     'sports': [
         {
             label: 'football',
-            image: 'images/ball.png',
-            vertice: [150, 350],
-            w: 50,
-            h: 50
+            image: 'images/football_texture.png',
+            vertice: [200, 300],
+            geometry: 'sphere',
+            w: 40,
+            h: 20
         },
         {
             label: 'basketball',
-            image: 'images/basketball.png',
-            vertice: [150, 350],
-            w: 50,
-            h: 50
+            image: 'images/basketball_texture.jpg',
+            vertice: [200, 300],
+            geometry: 'sphere',
+            w: 40,
+            h: 20
         },
         {
             label: 'baseball',
-            image: 'images/baseball.gif',
-            vertice: [150, 350],
-            w: 50,
-            h: 50
+            image: 'images/baseball_texture.jpg',
+            vertice: [200, 300],
+            geometry: 'sphere',
+            w: 40,
+            h: 20
         },
         {
             label: 'golf',
-            image: 'images/golf.png',
-            vertice: [150, 350],
-            w: 50,
-            h: 50
+            image: 'images/golf_texture.jpg',
+            vertice: [200, 300],
+            geometry: 'sphere',
+            w: 40,
+            h: 20
         },
         {
             label: 'tennis',
-            image: 'images/tennis.png',
-            vertice: [150, 350],
-            w: 50,
-            h: 50
+            image: 'images/tennis_texture.jpg',
+            vertice: [200, 300],
+            geometry: 'sphere',
+            w: 40,
+            h: 20
         }
     ]
 };
