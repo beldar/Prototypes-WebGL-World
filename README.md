@@ -1,6 +1,8 @@
-#WebGL Rotating World
+#WebGL Rotating World with add on elements
 
-TBC
+This prototype features a WebGL rendered world globe where add ons get attached to it depending on the sliders value.
+
+![Preview](https://raw.githubusercontent.com/beldar/Prototypes-WebGL-World/master/world.gif)
 
 ## Install
 
